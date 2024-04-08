@@ -1,33 +1,45 @@
-import os
-import hashlib
+#!/usr/bin/env python3
+import hashlib  # ハッシュ関数を提供するhashlibモジュールをインポート
+import os       # オペレーティングシステムとのやり取りを行うosモジュールをインポート
 from preparation import output_result_comparison
 from preparation import output_send_target
+from preparation import generate_destination_storage
 
-def cal_dir_hash(dir):
-    dir_hash = hashlib.md5()
-    #ディレクトリ内を走査
-    for root, dirs, files in os.walk(dir):
-        for filename in files:
-            file_path = os.path.join(root,filename)
-            with open(file_path,'rb')as f:
-                while True:
-                    data = f.read(65536)
-                    if not data:
-                        break
-                    dir_hash.update(data)
-                    print(f"Hashing file: {file_path} ({f.tell()} bytes processed)")
-    return dir_hash.hexdigest()
+#　ここでは計算するだけ，計算するディレクトリはarchive.pyで選出してそれを受け取って比較する．
 
-dir1 = "/test/test1.txt"
-dir2 = "/test_sub/test1.txt"
+def calculate_md5(directory):
+    files = []  # ファイルパスを格納する空のリストを初期化
+    for f in os.listdir(directory):
+        file_path = os.path.join(directory, f)  # ファイル/ディレクトリのパスを作成
+        if os.path.isfile(file_path):  # アイテムがファイルであるかを確認
+            files.append(file_path)     # ファイルパスをファイルのリストに追加
+    
+    files.sort()  # ファイルのリストをアルファベット順にソート
+    
+    md5_hash = hashlib.md5()
+    
+    # ファイルリスト内の各ファイルについて繰り返す
+    for file_path in files:
+        #print(file)
+        # ファイルをバイナリモードで開く
+        with open(file_path, "rb") as f:
+            # ファイルの内容を読み取り、MD5ハッシュを更新
+            md5_hash.update(f.read(65553))
+            print(f"Hashing file: {file_path} ({f.tell()} bytes processed)")
 
-hash1 = cal_dir_hash(dir1)
-hash2 = cal_dir_hash(dir2)
+    # MD5ハッシュの16進数表現を返す
+    return md5_hash.hexdigest()
 
-print(hash1)
-print(hash2)
+def test():
+    directory1 = generate_destination_storage()
+    directory2 = output_send_target()
 
-#if hash1 == hash2:
-#    print("The contents of the directories are identical.")
-#else:
-#    print("The contents of the directories do not match.")
+    print(directory1[59])
+    print(directory2[59])
+
+    file_hashes1 = calculate_md5(directory1[59])
+    file_hashes2 = calculate_md5(directory2[59])
+
+    print(file_hashes1)
+    print(file_hashes2)
+

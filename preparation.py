@@ -58,7 +58,17 @@ def output_send_target():
     dir_path = "/mnt/iscsi/target-mini2/VM-archive"
     output_send_target = os.listdir(dir_path)
     absolute_paths = [os.path.join(dir_path, item) for item in output_send_target]
-    #print(absolute_paths[50])
+    #print(absolute_paths)
     return absolute_paths
 
+
+def generate_destination_storage():
+    destination_path = output_send_target()
+    min_storage = output_result_comparison()
+    destination_storage = [os.path.join(min_storage, os.path.basename(directory)) for directory in destination_path]
+    #print(destination_storage)
+    return destination_storage
+
 #output_send_target()
+#output_result_comparison()
+#generate_destination_storage()
