@@ -2,6 +2,15 @@
 import subprocess
 import random
 import os
+from read_DBtest import mysql_read_data
+import mysql.connector
+conn = mysql.connector.connect(
+    host="192.168.100.148",
+    user="root",
+    password="password",
+    port="30000",
+    database="VM_archive_DB"
+)
 
 def output_dict_result():
     command1 = ['df', '-h']
@@ -43,13 +52,14 @@ def output_dict_result():
 
 #容量の比較
 def output_result_comparison():
+        #dataには対象ストレージの使用量が入っている
     data = output_dict_result()
     
     min_value = min(int(v) for v in data.values())
     min_keys = [k for k, v in data.items() if int(v) == min_value]
 
     random_min_key = random.choice(min_keys)
-    #print(random_min_key)
+    #print(random_min_key)]
     return random_min_key
 
 
@@ -61,14 +71,23 @@ def output_send_target():
     #print(absolute_paths)
     return absolute_paths
 
+vm_storage_mapping ={}
+#storageに来るVMのパスを生成
+def generate_destination_storage(conn, vmname):
+    global vm_storage_mapping
+    # VMごとに選択されたストレージパスを辞書から取得
+    if vmname in vm_storage_mapping:
+        # VMに対して既に選択されたストレージパスがある場合はそれを使用
+        min_storage = vm_storage_mapping[vmname]
+    else:
+        # 初回の処理の場合はoutput_result_comparison()でストレージを選択
+        min_storage = output_result_comparison()
+        # 選択したストレージパスを辞書に記憶
+        vm_storage_mapping[vmname] = min_storage
 
-def generate_destination_storage():
-    destination_path = output_send_target()
-    min_storage = output_result_comparison()
-    destination_storage = [os.path.join(min_storage, os.path.basename(directory)) for directory in destination_path]
-    #print(destination_storage)
-    return destination_storage
+    # VMのストレージパスを構築して返す
+    storage_path = os.path.join(min_storage, vmname)
+    return storage_path
 
 #output_send_target()
 #output_result_comparison()
-#generate_destination_storage()
