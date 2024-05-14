@@ -23,6 +23,6 @@ def calculate_md5(directory):
             while chunk := f.read(16777216):
                 md5_hash.update(chunk)
                 print(f"Hashing file: {file_path} ({f.tell()} bytes processed)")
-    print(md5_hash.hexdigest())
+    #print(md5_hash.hexdigest())
     # MD5ハッシュの16進数表現を返す
     return md5_hash.hexdigest()
