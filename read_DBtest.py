@@ -1,10 +1,10 @@
 import mysql.connector
 
 conn = mysql.connector.connect(
-    host="192.168.100.35",
+    host="192.168.100.148",
     user="root",
     password="password",
-    port="32000",
+    port="30000",
     database="VM_archive_DB"
 )
 
@@ -20,7 +20,7 @@ def mysql_read_data(conn):
 def mysql_read_after_data(conn):
     curs = conn.cursor()
     # テーブルの内容を表示
-    curs.execute("SELECT * from AFTER_ARCHIVE_DATA")
+    curs.execute("SELECT date_time from AFTER_ARCHIVE_DATA")
     rows = curs.fetchall()
     curs.close()
     #print(rows)

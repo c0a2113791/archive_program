@@ -2,17 +2,17 @@
 #　テーブルの記録もVM_ARCHIVEにあるデータもstorageにあるデータも消す．
 import mysql.connector
 from datetime import datetime, timedelta
-from archive_program.read_DB import mysql_read_data
-from archive_program.read_DB import mysql_read_after_data
+from read_DB import mysql_read_data
+from read_DB import mysql_read_after_data
 import os
 import shutil
 import logging
 logging.basicConfig(format='[%(asctime)s]\t%(levelname)s\t%(message)s', datefmt='%d/%b/%Y:%H:%M:%S %z',filename='/var/log/archive.log',level=logging.INFO)
 conn = mysql.connector.connect(
-    host="192.168.100.148",
+    host="192.168.100.35",
     user="root",
     password="password",
-    port="30000",
+    port="32000",
     database="VM_archive_DB"
 )
 
@@ -29,14 +29,13 @@ def del_data_after_three_month(conn):
         user = row[4]
         del_VM = os.path.join("/home/c0a21137/", VM_path)
         #print(entry_date)
-        deletion_date = entry_date + timedelta(days=3*30)  # Assuming each month has 30 days
-        #print(deletion_date)
+        deletion_date = entry_date + timedelta(days=90)  # Assuming each month has 30 days
         # Check if deletion date has passed
         if datetime.now() > deletion_date:
-            logging.info("Starting deletion of records older than 3 months.")
+            logging.info("deletion of records older than 3 months.")
             current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             #ここに日付を超えたデータを削除するコードを
-            query = "DELETE FROM AFTER_ARCHIVE_DATA WHERE entry_date = %s"
+            query = "DELETE FROM AFTER_ARCHIVE_DATA WHERE date_time = %s"
             his_query = "INSERT INTO HISTORY_OF_HDD (date_time, VM_path, ESXi, user, Processing) VALUES (%s, %s, %s, %s, %s)"
             cur.execute(his_query, (current_datetime, VM_path, esxi,user,'records older than 3 months have been purged'))
             cursor.execute(query, (entry_date,))
